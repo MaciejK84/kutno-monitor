@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS listings_raw (
     snapshot_ts TEXT,
     portal TEXT,
     segment TEXT,
-    transaction TEXT,
+    transaction_type TEXT,
     listing_id TEXT,
     listing_key TEXT,
     title TEXT,
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS listings_unique (
     snapshot_ts TEXT,
     portal TEXT,
     segment TEXT,
-    transaction TEXT,
+    transaction_type TEXT,
     listing_id TEXT,
     listing_key TEXT,
     title TEXT,
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS aggregates (
     run_id TEXT,
     snapshot_ts TEXT,
     segment TEXT,
-    transaction TEXT,
+    transaction_type TEXT,
     metric_name TEXT,
     metric_value REAL
 );
