@@ -32,7 +32,7 @@ def normalize_listings(df: pd.DataFrame, snapshot_ts: str, run_id: str) -> pd.Da
         "snapshot_ts",
         "portal",
         "segment",
-        "transaction",
+        "transaction_type",
         "listing_id",
         "listing_key",
         "title",
@@ -49,7 +49,7 @@ def normalize_listings(df: pd.DataFrame, snapshot_ts: str, run_id: str) -> pd.Da
         "status",
         "extracted_text",
     ]
-    return out[columns].sort_values(["portal", "segment", "transaction", "price"], na_position="last")
+    return out[columns].sort_values(["portal", "segment", "transaction_type", "price"], na_position="last")
 
 
 def _build_listing_key(row: pd.Series) -> str:
@@ -58,14 +58,14 @@ def _build_listing_key(row: pd.Series) -> str:
     area = row.get("area_sqm")
     price = row.get("price")
     loc = str(row.get("location") or "").lower().strip()
-    payload = f"{row.get('segment')}|{row.get('transaction')}|{loc}|{round(area or 0,1)}|{round(price or 0,0)}|{title[:80]}"
+    payload = f"{row.get('segment')}|{row.get('transaction_type')}|{loc}|{round(area or 0,1)}|{round(price or 0,0)}|{title[:80]}"
     return hashlib.md5(payload.encode("utf-8")).hexdigest()
 
 
 def _empty_df() -> pd.DataFrame:
     return pd.DataFrame(
         columns=[
-            "run_id","snapshot_ts","portal","segment","transaction","listing_id","listing_key","title","location",
+            "run_id","snapshot_ts","portal","segment","transaction_type","listing_id","listing_key","title","location",
             "price","price_per_sqm","area_sqm","advertiser_type","publication_date","listing_age_days",
             "reduced_price","url","source_url","status","extracted_text"
         ]
