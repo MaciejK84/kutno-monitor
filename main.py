@@ -32,16 +32,16 @@ def run() -> Path:
         meta = {
             "portal": portal,
             "segment": search["segment"],
-            "transaction": search["transaction"],
+            "transaction_type": search["transaction_type"],
             "source_url": search["url"],
         }
         try:
             payload = fetch_page(search["url"])
             rows = parser(payload, meta)
-            logging.info("%s | %s | %s -> %s rekordów", portal, search["segment"], search["transaction"], len(rows))
+            logging.info("%s | %s | %s -> %s rekordów", portal, search["segment"], search["transaction_type"], len(rows))
             all_rows.extend(rows)
         except Exception as exc:
-            logging.exception("Błąd przy %s | %s | %s: %s", portal, search["segment"], search["transaction"], exc)
+            logging.exception("Błąd przy %s | %s | %s: %s", portal, search["segment"], search["transaction_type"], exc)
 
     raw_df = pd.DataFrame(all_rows)
     normalized_df = normalize_listings(raw_df, snapshot_ts=snapshot_ts, run_id=run_id)
@@ -57,7 +57,7 @@ def run() -> Path:
     if not aggregates.empty:
         aggregates["run_id"] = run_id
         aggregates["snapshot_ts"] = snapshot_ts
-        aggregates = aggregates[["run_id", "snapshot_ts", "segment", "transaction", "metric_name", "metric_value"]]
+        aggregates = aggregates[["run_id", "snapshot_ts", "segment", "transaction_type", "metric_name", "metric_value"]]
 
     append_df(normalized_df, "listings_raw")
     append_df(unique_df, "listings_unique")
