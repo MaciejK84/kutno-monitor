@@ -6,18 +6,18 @@ import pandas as pd
 def compute_aggregates(unique_df: pd.DataFrame, new_df: pd.DataFrame, price_changes_df: pd.DataFrame) -> pd.DataFrame:
     rows = []
     if unique_df.empty:
-        return pd.DataFrame(columns=["segment", "transaction", "metric_name", "metric_value"])
+        return pd.DataFrame(columns=["segment", "transaction_type_type", "metric_name", "metric_value"])
 
-    for (segment, transaction), group in unique_df.groupby(["segment", "transaction"], dropna=False):
-        rows.extend(_rows_for_group(segment, transaction, group, new_df, price_changes_df))
+    for (segment, transaction_type_type), group in unique_df.groupby(["segment", "transaction_type_type"], dropna=False):
+        rows.extend(_rows_for_group(segment, transaction_type_type, group, new_df, price_changes_df))
 
     rows.extend(_rows_for_group("razem", "razem", unique_df, new_df, price_changes_df))
     return pd.DataFrame(rows)
 
 
-def _rows_for_group(segment, transaction, group, new_df, price_changes_df):
-    subset_new = new_df[(new_df["segment"] == segment) & (new_df["transaction"] == transaction)] if segment != "razem" else new_df
-    subset_changes = price_changes_df[(price_changes_df["segment"] == segment) & (price_changes_df["transaction"] == transaction)] if segment != "razem" else price_changes_df
+def _rows_for_group(segment, transaction_type_type, group, new_df, price_changes_df):
+    subset_new = new_df[(new_df["segment"] == segment) & (new_df["transaction_type_type"] == transaction_type_type)] if segment != "razem" else new_df
+    subset_changes = price_changes_df[(price_changes_df["segment"] == segment) & (price_changes_df["transaction_type_type"] == transaction_type_type)] if segment != "razem" else price_changes_df
 
     biuro_share = ((group["advertiser_type"] == "biuro").mean() * 100) if len(group) else None
     prywatne_share = ((group["advertiser_type"] == "prywatne").mean() * 100) if len(group) else None
@@ -29,17 +29,17 @@ def _rows_for_group(segment, transaction, group, new_df, price_changes_df):
     distribution = bucket.value_counts(dropna=False).to_dict()
 
     rows = [
-        {"segment": segment, "transaction": transaction, "metric_name": "count_unique", "metric_value": float(len(group))},
-        {"segment": segment, "transaction": transaction, "metric_name": "median_price", "metric_value": _safe_median(group["price"])},
-        {"segment": segment, "transaction": transaction, "metric_name": "mean_price_sqm", "metric_value": _safe_mean(group["price_per_sqm"])},
-        {"segment": segment, "transaction": transaction, "metric_name": "median_price_sqm", "metric_value": _safe_median(group["price_per_sqm"])},
-        {"segment": segment, "transaction": transaction, "metric_name": "median_area_sqm", "metric_value": _safe_median(group["area_sqm"])},
-        {"segment": segment, "transaction": transaction, "metric_name": "median_listing_age_days", "metric_value": _safe_median(group["listing_age_days"])},
-        {"segment": segment, "transaction": transaction, "metric_name": "share_biuro_pct", "metric_value": biuro_share},
-        {"segment": segment, "transaction": transaction, "metric_name": "share_prywatne_pct", "metric_value": prywatne_share},
-        {"segment": segment, "transaction": transaction, "metric_name": "share_reduced_pct", "metric_value": reduced_share},
-        {"segment": segment, "transaction": transaction, "metric_name": "new_listings_count", "metric_value": float(len(subset_new))},
-        {"segment": segment, "transaction": transaction, "metric_name": "price_changes_count", "metric_value": float(len(subset_changes))},
+        {"segment": segment, "transaction_type_type": transaction_type, "metric_name": "count_unique", "metric_value": float(len(group))},
+        {"segment": segment, "transaction_type_type": transaction_type, "metric_name": "median_price", "metric_value": _safe_median(group["price"])},
+        {"segment": segment, "transaction_type_type": transaction_type, "metric_name": "mean_price_sqm", "metric_value": _safe_mean(group["price_per_sqm"])},
+        {"segment": segment, "transaction_type_type": transaction_type, "metric_name": "median_price_sqm", "metric_value": _safe_median(group["price_per_sqm"])},
+        {"segment": segment, "transaction_type_type": transaction_type, "metric_name": "median_area_sqm", "metric_value": _safe_median(group["area_sqm"])},
+        {"segment": segment, "transaction_type_type": transaction_type, "metric_name": "median_listing_age_days", "metric_value": _safe_median(group["listing_age_days"])},
+        {"segment": segment, "transaction_type_type": transaction_type, "metric_name": "share_biuro_pct", "metric_value": biuro_share},
+        {"segment": segment, "transaction_type_type": transaction_type, "metric_name": "share_prywatne_pct", "metric_value": prywatne_share},
+        {"segment": segment, "transaction_type_type": transaction_type, "metric_name": "share_reduced_pct", "metric_value": reduced_share},
+        {"segment": segment, "transaction_type_type": transaction_type, "metric_name": "new_listings_count", "metric_value": float(len(subset_new))},
+        {"segment": segment, "transaction_type_type": transaction_type, "metric_name": "price_changes_count", "metric_value": float(len(subset_changes))},
     ]
     for label, value in distribution.items():
         if pd.isna(label):
@@ -47,7 +47,7 @@ def _rows_for_group(segment, transaction, group, new_df, price_changes_df):
         rows.append(
             {
                 "segment": segment,
-                "transaction": transaction,
+                "transaction_type_type": transaction_type_type,
                 "metric_name": f"price_bucket_{label}",
                 "metric_value": float(value),
             }
