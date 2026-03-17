@@ -43,7 +43,7 @@ def deduplicate_listings(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _is_duplicate(a: pd.Series, b: pd.Series) -> bool:
-    if a["segment"] != b["segment"] or a["transaction"] != b["transaction"]:
+    if a["segment"] != b["segment"] or a["transaction_type"] != b["transaction_type"]:
         return False
     if "kutno" not in str(a.get("location", "")).lower() or "kutno" not in str(b.get("location", "")).lower():
         return False
